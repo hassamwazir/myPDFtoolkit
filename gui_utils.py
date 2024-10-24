@@ -15,16 +15,21 @@ def upload_and_load_pdf(file_name_var, images, update_image, update_page_text, r
     # Browse for a file
     pdf_file_path = filedialog.askopenfilename(filetypes=[("PDF files", "*.pdf")])
     if pdf_file_path:
-        # Set the file name in the text bar
         file_name_var.set(pdf_file_path)
-        # Open the PDF using PyMuPDF
-        pdf_document = fitz.open(pdf_file_path)
-        images.clear()
-        images.extend(pdf_tools.load_pdf(pdf_file_path))  # Load PDF as images using pdf_tools
-        update_image(0)  # Show the first page as an image
-        update_page_text(0, len(images))  # Update the page text
-        remove_button.config(state="normal")  # Enable the remove page button
-        save_button.config(state="normal")    # Enable the save button
+        pdf_document = fitz.open(pdf_file_path)  # Open PDF
+        images.clear()  # Clear the existing images list
+        loaded_images = pdf_tools.load_pdf(pdf_file_path)
+        
+        if loaded_images:
+            images.extend(loaded_images)
+            update_image(0)
+            update_page_text(0, len(images))
+            remove_button.config(state="normal")  # Ensure button is enabled here
+            save_button.config(state="normal")    # Ensure button is enabled here
+        else:
+            messagebox.showerror("Error", "Failed to load PDF pages.")
+            remove_button.config(state="disabled")
+            save_button.config(state="disabled")
 
 def upload_files(file_list_var):
     """Allow the user to upload PDF, JPEG, and PNG files."""
@@ -65,19 +70,17 @@ def save_pdf():
     if pdf_document:
         save_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF files", "*.pdf")])
         if save_path:
-            pdf_document.save(save_path)
-            pdf_document.close()
-            pdf_document = None  # Reset the document
+            try:
+                # Save the document to the new path (will overwrite any existing file at that path)
+                pdf_document.save(save_path)
+                messagebox.showinfo("Success", f"PDF saved successfully as {save_path}")
+                pdf_document.close()
+                pdf_document = None  # Reset the document
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to save PDF: {str(e)}")
 
-# def merge_pdfs():
-#     """Merge multiple PDF files into one."""
-#     pdf_paths = filedialog.askopenfilenames(filetypes=[("PDF files", "*.pdf")], title="Select PDF files to merge")
-#     if pdf_paths:
-#         save_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF files", "*.pdf")])
-#         if save_path:
-#             pdf_tools.merge_files(pdf_paths, save_path)
 
-def merge_files(file_list_var):
+def merge_files(file_list_var, file_listbox):
     """Merge uploaded files (PDFs and images) into a single PDF, ensuring images match the page size while maintaining aspect ratio."""
     if not file_list_var:
         messagebox.showerror("Error", "No files selected for merging.")
@@ -149,3 +152,5 @@ def merge_files(file_list_var):
     merger.close()
     messagebox.showinfo("Success", f"Merged PDF saved as {save_path}")
     file_list_var.clear()  # Clear the file list after merging
+    # clear the file_listbox
+    file_listbox.delete(0, tk.END)
