@@ -145,15 +145,15 @@ button_frame = tk.Frame(merge_tab)
 button_frame.pack(pady=5)
 
 # + button to add files
-add_button = Button(button_frame, text="+", command=add_files)
-add_button.grid(row=0, column=0, padx=5)
+add_file_button = Button(button_frame, text="+", command=add_files)
+add_file_button.grid(row=0, column=0, padx=5)
 
 # - button to remove the selected file
-remove_button = Button(button_frame, text="-", command=remove_file)
-remove_button.grid(row=0, column=1, padx=5)
+remove_file_button = Button(button_frame, text="-", command=remove_file)
+remove_file_button.grid(row=0, column=1, padx=5)
 
 # Merge button (to merge files in the order they were uploaded)
-merge_button = Button(merge_tab, text="Merge Files", command=lambda: gui_utils.merge_files(file_list_var))
+merge_button = Button(merge_tab, text="Merge Files", command=lambda: gui_utils.merge_files(file_list_var, file_listbox))
 merge_button.pack(pady=5)
 
 # Start the tkinter loop
