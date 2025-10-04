@@ -1,0 +1,4 @@
+Pillow==10.*
+PyMuPDF==1.24.*
+ttkbootstrap==1.10.*
+appdirs==1.4.*
